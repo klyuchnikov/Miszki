@@ -14,6 +14,9 @@ namespace Lab1
         public MainForm()
         {
             InitializeComponent();
+            var gen = new CommonLibrary.CongruentialGenerator(1613);
+            var res = gen.Next(255);
+
         }
     }
 }
