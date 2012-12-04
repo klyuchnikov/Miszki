@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lab1", "Lab1\Lab1.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonLibrary", "CommonLibrary\CommonLibrary.csproj", "{2CA57F9B-45F1-4B76-A27D-E138A83A70CD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lab2", "Lab2\Lab2.csproj", "{A2FD836E-DF11-4639-B323-E80541F2004E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,16 @@ Global
 		{2CA57F9B-45F1-4B76-A27D-E138A83A70CD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{2CA57F9B-45F1-4B76-A27D-E138A83A70CD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{2CA57F9B-45F1-4B76-A27D-E138A83A70CD}.Release|x86.ActiveCfg = Release|Any CPU
+		{A2FD836E-DF11-4639-B323-E80541F2004E}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{A2FD836E-DF11-4639-B323-E80541F2004E}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{A2FD836E-DF11-4639-B323-E80541F2004E}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{A2FD836E-DF11-4639-B323-E80541F2004E}.Debug|x86.ActiveCfg = Debug|x86
+		{A2FD836E-DF11-4639-B323-E80541F2004E}.Debug|x86.Build.0 = Debug|x86
+		{A2FD836E-DF11-4639-B323-E80541F2004E}.Release|Any CPU.ActiveCfg = Release|x86
+		{A2FD836E-DF11-4639-B323-E80541F2004E}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{A2FD836E-DF11-4639-B323-E80541F2004E}.Release|Mixed Platforms.Build.0 = Release|x86
+		{A2FD836E-DF11-4639-B323-E80541F2004E}.Release|x86.ActiveCfg = Release|x86
+		{A2FD836E-DF11-4639-B323-E80541F2004E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
