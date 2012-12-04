@@ -144,7 +144,7 @@
             this.Controls.Add(this.passTB);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "MainForm";
-            this.Text = "Form1";
+            this.Text = "№1. Хеширование паролей. Генераторы случайных чисел";
             this.ResumeLayout(false);
             this.PerformLayout();
 
