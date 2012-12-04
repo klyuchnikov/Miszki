@@ -14,7 +14,8 @@ namespace Lab1
         public MainForm()
         {
             InitializeComponent();
-            var gen = new CommonLibrary.CongruentialGenerator(1613);
+            var hash = CommonLibrary.MaHash8v64.GetHashCode("привет");
+            var gen = new CommonLibrary.CongruentialGenerator(hash);
             var res = gen.Next(255);
 
         }
