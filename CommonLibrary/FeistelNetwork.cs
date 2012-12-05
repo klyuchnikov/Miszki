@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.ComponentModel;
 
 namespace CommonLibrary
 {
@@ -11,6 +12,14 @@ namespace CommonLibrary
     /// </summary>
     public class FeistelNetwork
     {
+
+        private delegate void CryptFunctionDelegate(string inputFile, string outputFile, string key);
+        private CryptFunctionDelegate cfDelegate;
+
+        public int MaxValueProcess { get; private set; }
+
+        public int CurrentValueProcess { get; private set; }
+
         /// <summary>
         /// Количество иттераций
         /// </summary>
@@ -23,12 +32,13 @@ namespace CommonLibrary
         /// <summary>
         /// Создание экземпляра
         /// </summary>
-        /// <param name="BlockLenth">Количество иттераций</param>
-        /// <param name="rounds">Длина блока</param>
+        /// <param name="BlockLenth">Длина блока</param>
+        /// <param name="rounds">Количество иттераций</param>
         public FeistelNetwork(byte BlockLenth, byte rounds)
         {
             this.BlockLenth = BlockLenth;
             this.Rounds = rounds;
+            cfDelegate = new CryptFunctionDelegate(this.Crypt);
         }
 
         /// <summary>
@@ -36,14 +46,13 @@ namespace CommonLibrary
         /// </summary>
         /// <param name="data">Массив данных</param>
         /// <param name="key">Ключ</param>
+        /// <param name="ind"> </param>
         /// <returns></returns>
-        private byte[] F(byte[] data, byte key)
-        {
-            var clone = (byte[])data.Clone();
-            for (var i = 0; i < clone.Length; i++)
-                clone[i] = (byte)(data[i] ^ key);
-            return clone;
-        }
+        /*    private void F(ref byte[] data, byte key, int ind)
+            {
+                for (var i = ind; i < ind + BlockLenth / 2; i++)
+                    data[i] = (byte)(data[i] ^ key);
+            }*/
 
         /// <summary>
         /// Функция ^ (xor) между двумя массивами байтов
@@ -51,6 +60,18 @@ namespace CommonLibrary
         /// <param name="a">Массив данных</param>
         /// <param name="b">Массив данных</param>
         /// <returns>a ^ b</returns>
+        /*    private void XOR(ref byte[] data, int ind1, int ind2)
+            {
+                for (var i = 0; i < BlockLenth / 2; i++)
+                    data[i + ind1] = (byte)(data[i + ind1] ^ data[i + ind2]);
+            }*/
+        private byte[] F(byte[] data, byte key)
+        {
+            var clone = (byte[])data.Clone();
+            for (var i = 0; i < clone.Length; i++)
+                clone[i] = (byte)(data[i] ^ key);
+            return clone;
+        }
         private byte[] XOR(byte[] a, byte[] b)
         {
             var res = new byte[a.Length];
@@ -59,18 +80,22 @@ namespace CommonLibrary
             return res;
         }
 
+
         /// <summary>
         /// Общая функция преобразования входного массива байтов 
         /// </summary>
         /// <param name="file">входной массив байтов</param>
         /// <param name="reverse">если false - шифрация, true - дешифрация</param>
         /// <param name="key">ключ</param>
-        private void Crypt(ref byte[] file, bool reverse, string key)
+        private void Crypt(string inputFile, string outputFile, string key)
         {
+            var file = File.ReadAllBytes(inputFile);
             var gen = new CongruentialGenerator(MaHash8v64.GetHashCode(key));
             var keys = new byte[Rounds];
             for (var i = 0; i < keys.Length; i++)
                 keys[i] = (byte)gen.Next(byte.MaxValue);
+
+            this.MaxValueProcess = (int)(file.LongLength * Rounds);
 
             byte[] l = new byte[BlockLenth / 2];
             byte[] r = new byte[BlockLenth / 2];
@@ -99,6 +124,8 @@ namespace CommonLibrary
                     }
                 }
             }
+
+            File.WriteAllBytes(outputFile, file);
         }
 
         /// <summary>
@@ -106,9 +133,9 @@ namespace CommonLibrary
         /// </summary>
         /// <param name="file">входной массив байтов</param>
         /// <param name="key"> ключ</param>
-        public void Encrypt(ref byte[] file, string key)
+        public void Encrypt(string inputFile, string outputFile, string key)
         {
-            Crypt(ref file, false, key);
+            cfDelegate.BeginInvoke(inputFile, outputFile, key, null, null);
         }
 
         /// <summary>
@@ -116,9 +143,9 @@ namespace CommonLibrary
         /// </summary>
         /// <param name="file">входной массив байтов</param>
         /// <param name="key">ключ</param>
-        public void Decrypt(ref byte[] file, string key)
+        public void Decrypt(string inputFile, string outputFile, string key)
         {
-            Crypt(ref file, true, key);
+            cfDelegate.BeginInvoke(inputFile, outputFile, key, null, null);
         }
     }
 }
