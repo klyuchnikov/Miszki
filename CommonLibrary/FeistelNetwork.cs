@@ -48,11 +48,11 @@ namespace CommonLibrary
         /// <param name="key">Ключ</param>
         /// <param name="ind"> </param>
         /// <returns></returns>
-        /*    private void F(ref byte[] data, byte key, int ind)
-            {
-                for (var i = ind; i < ind + BlockLenth / 2; i++)
-                    data[i] = (byte)(data[i] ^ key);
-            }*/
+        private void F(ref byte[] data, byte key, int ind)
+        {
+            for (var i = ind; i < ind + BlockLenth / 2; i++)
+                data[i] = (byte)(data[i] ^ key);
+        }
 
         /// <summary>
         /// Функция ^ (xor) между двумя массивами байтов
@@ -60,26 +60,11 @@ namespace CommonLibrary
         /// <param name="a">Массив данных</param>
         /// <param name="b">Массив данных</param>
         /// <returns>a ^ b</returns>
-        /*    private void XOR(ref byte[] data, int ind1, int ind2)
-            {
-                for (var i = 0; i < BlockLenth / 2; i++)
-                    data[i + ind1] = (byte)(data[i + ind1] ^ data[i + ind2]);
-            }*/
-        private byte[] F(byte[] data, byte key)
+        private void XOR(ref byte[] data, int ind1, int ind2)
         {
-            var clone = (byte[])data.Clone();
-            for (var i = 0; i < clone.Length; i++)
-                clone[i] = (byte)(data[i] ^ key);
-            return clone;
+            for (var i = 0; i < BlockLenth / 2; i++)
+                data[i + ind1] = (byte)(data[i + ind1] ^ data[i + ind2]);
         }
-        private byte[] XOR(byte[] a, byte[] b)
-        {
-            var res = new byte[a.Length];
-            for (var i = 0; i < a.Length; i++)
-                res[i] = (byte)(a[i] ^ b[i]);
-            return res;
-        }
-
 
         /// <summary>
         /// Общая функция преобразования входного массива байтов 
@@ -97,34 +82,29 @@ namespace CommonLibrary
 
             this.MaxValueProcess = (int)(file.LongLength * Rounds);
 
-            byte[] l = new byte[BlockLenth / 2];
-            byte[] r = new byte[BlockLenth / 2];
 
             var lenthBlocks = Math.Truncate((double)(file.LongLength / BlockLenth));
+
             for (byte k = 0; k < Rounds; k++)
             {
-                for (var i = 0; i < lenthBlocks; i++)
+                for (var i = 0; i < lenthBlocks * BlockLenth; i += 10)
                 {
-                    l = file.Skip(i * BlockLenth).Take(BlockLenth / 2).ToArray();
-                    r = file.Skip(i * BlockLenth + BlockLenth / 2).Take(BlockLenth / 2).ToArray();
                     if (i < Rounds - 1) // если не последний раунд
                     {
-                        byte[] t = l;
-                        l = XOR(F(l, keys[k]), r);
-                        r = t;
+                        byte[] t = file.Skip(i).Take(BlockLenth / 2).ToArray();
+                        F(ref file, keys[k], i);
+                        XOR(ref file, i, i + BlockLenth / 2);
+                        for (int j = 0; j < t.Length; j++)
+                            file[j + i + BlockLenth / 2] = t[j];
                     }
                     else // последний раунд
                     {
-                        r = XOR(F(l, keys[k]), r);
+                        F(ref file, keys[k], i);
+                        XOR(ref file, i + BlockLenth / 2, i);
                     }
-                    for (int j = 0; j < BlockLenth / 2; j++)
-                    {
-                        file[i * BlockLenth + j] = l[j];
-                        file[i * BlockLenth + j + BlockLenth / 2] = r[j];
-                    }
+                    this.CurrentValueProcess = i + k * Rounds;
                 }
             }
-
             File.WriteAllBytes(outputFile, file);
         }
 
