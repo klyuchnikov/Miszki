@@ -8,7 +8,6 @@ namespace CommonLibrary
 {
     public abstract class CrypterBlocks
     {
-
         public delegate void ComplitedHandler(string password);
         public delegate void ComplitedStringHandler(string result);
         public delegate void ComplitedBytesHandler(byte[] result);
@@ -44,6 +43,31 @@ namespace CommonLibrary
         /// Длина блока
         /// </summary>
         public byte BlockLenth { get; protected set; }
+
+
+        protected byte[] keys;
+
+        public CrypterBlocks(byte BlockLenth, byte subBlocks, string pass)
+        {
+            this.BlockLenth = BlockLenth;
+            this.SubBlocks = subBlocks;
+            this.Password = pass;
+            GenKeys(pass);
+        }
+        /// <summary>
+        /// Генерация псевдослучайных ключей, зависимых от входного ключа-пароля
+        /// </summary>
+        /// <param name="key"></param>
+        protected void GenKeys(string key)
+        {
+            var gen = new CongruentialGenerator(MaHash8v64.GetHashCode(key));
+            keys = new byte[this.SubBlocks];
+            for (var i = 0; i < keys.Length - 1; i++)
+                keys[i] = (byte)gen.Next(1, this.BlockLenth / 2 - keys.Sum(a => a) - (this.SubBlocks - i - 1));
+            keys[keys.Length - 1] = (byte)(this.BlockLenth / 2 - keys.Sum(a => a));
+        }
+
+
         /// <summary>
         /// Основная функция изменения блока данных по данному методу
         /// </summary>
