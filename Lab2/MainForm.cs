@@ -126,12 +126,25 @@ namespace Lab2
             groupBox5.Enabled = false;
             groupBox6.Enabled = false;
             oldTime = DateTime.Now;
+            crypter.DecryptComplitedEvent += crypter_DecryptComplitedEvent;
             if (encryptRB.Checked)
                 crypter.EncryptAsync(inputBrowseTB.Text, outputBrowseTB.Text);
             else if (decryptRB.Checked)
                 crypter.DecryptAsync(inputBrowseTB.Text, outputBrowseTB.Text);
 
 
+        }
+
+        void crypter_DecryptComplitedEvent(CryptResult cryptResult, string password)
+        {
+            if (cryptResult == CryptResult.MismatchValueParameters)
+                MessageBox.Show("Заданные параметры дешифрации не соответствуют параметрам при шифровании");
+            groupBox1.Enabled = true;
+            groupBox2.Enabled = true;
+            groupBox3.Enabled = true;
+            groupBox4.Enabled = true;
+            groupBox5.Enabled = true;
+            groupBox6.Enabled = true;
         }
     }
 }
