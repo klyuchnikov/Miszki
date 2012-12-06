@@ -13,9 +13,7 @@ namespace CommonLibrary
     /// </summary>
     public class FeistelNetwork : CrypterBlocks
     {
-        private byte[] keys;
-
-
+        
         /// <summary>
         /// Количество иттераций
         /// </summary>
@@ -26,27 +24,11 @@ namespace CommonLibrary
         /// </summary>
         /// <param name="BlockLenth">Длина блока</param>
         /// <param name="rounds">Количество иттераций</param>
-        public FeistelNetwork(byte BlockLenth, byte rounds, byte subBlocks, string key)
+        public FeistelNetwork(byte BlockLenth, byte subBlocks, string pass, byte rounds) : base(BlockLenth, subBlocks, pass)
         {
-            this.BlockLenth = BlockLenth;
             this.Rounds = rounds;
-            this.SubBlocks = subBlocks;
-            this.Password = key;
-            GenKeys(key);
         }
 
-        /// <summary>
-        /// Генерация псевдослучайных ключей, зависимых от входного ключа-пароля
-        /// </summary>
-        /// <param name="key"></param>
-        private void GenKeys(string key)
-        {
-            var gen = new CongruentialGenerator(MaHash8v64.GetHashCode(key));
-            keys = new byte[this.SubBlocks];
-            for (var i = 0; i < keys.Length - 1; i++)
-                keys[i] = (byte)gen.Next(1, this.BlockLenth / 2 - keys.Sum(a => a) - (this.SubBlocks - i - 1));
-            keys[keys.Length - 1] = (byte)(this.BlockLenth / 2 - keys.Sum(a => a));
-        }
 
         /// <summary>
         /// Функция преобразования данных, сеть Фейстеля, изменненной левой ^ правой части и присваивание к левой части
