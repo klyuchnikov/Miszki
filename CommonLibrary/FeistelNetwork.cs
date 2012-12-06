@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.IO;
 using System.ComponentModel;
@@ -38,6 +39,7 @@ namespace CommonLibrary
         /// <param name="rounds">Количество иттераций</param>
         public FeistelNetwork(byte BlockLenth, byte rounds, byte subBlocks)
         {
+
             this.BlockLenth = BlockLenth;
             this.Rounds = rounds;
             this.SubBlocks = subBlocks;
@@ -51,19 +53,13 @@ namespace CommonLibrary
         /// <param name="key">Ключ</param>
         /// <param name="ind"> </param>
         /// <returns></returns>
-        /* private void F(ref byte[] data, byte key, int ind)
-         {
-             for (var i = ind; i < ind + BlockLenth / 2; i++)
-                 data[i] = (byte)(data[i] ^ key);
-         }
 
-         /// <summary>
-         /// Функция ^ (xor) между двумя массивами байтов
-         /// </summary>
-         /// <param name="a">Массив данных</param>
-         /// <param name="b">Массив данных</param>
-         /// <returns>a ^ b</returns>
-       */
+        /// <summary>
+        /// Функция ^ (xor) между двумя массивами байтов
+        /// </summary>
+        /// <param name="a">Массив данных</param>
+        /// <param name="b">Массив данных</param>
+        /// <returns>a ^ b</returns>
         private void XORl(ref byte[] data, byte[] lk, int indL)
         {
             byte temp;
@@ -78,7 +74,7 @@ namespace CommonLibrary
         private void XORr(ref byte[] data, byte[] lk, int indL)
         {
             for (var i = 0; i < BlockLenth / 2; i++)
-                data[i + indL] = (byte)(data[i + indL + BlockLenth / 2] ^ lk[i]);
+                data[i + indL + BlockLenth / 2] = (byte)(data[i + indL + BlockLenth / 2] ^ lk[i]);
         }
 
         private byte[] F(byte[] data, byte[] keys, int ind)
@@ -134,7 +130,11 @@ namespace CommonLibrary
         /// <param name="key"> ключ</param>
         public void Encrypt(string inputFile, string outputFile, string key)
         {
-            cfDelegate.BeginInvoke(inputFile, outputFile, true, key, null, null);
+            IAsyncResult res = null;
+            res = cfDelegate.BeginInvoke(inputFile, outputFile, true, key, delegate
+            {
+                cfDelegate.EndInvoke(res);
+            }, null);
         }
 
         /// <summary>
@@ -144,7 +144,11 @@ namespace CommonLibrary
         /// <param name="key">ключ</param>
         public void Decrypt(string inputFile, string outputFile, string key)
         {
-            cfDelegate.BeginInvoke(inputFile, outputFile, false, key, null, null);
+            IAsyncResult res = null;
+            res = cfDelegate.BeginInvoke(inputFile, outputFile, false, key, delegate
+            {
+                cfDelegate.EndInvoke(res);
+            }, null);
         }
     }
 }

@@ -54,6 +54,7 @@
             this.passTB = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.SpeedLabel = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -108,7 +109,6 @@
             this.ecbRB.Name = "ecbRB";
             this.ecbRB.Size = new System.Drawing.Size(46, 17);
             this.ecbRB.TabIndex = 1;
-            this.ecbRB.TabStop = true;
             this.ecbRB.Text = "ECB";
             this.ecbRB.UseVisualStyleBackColor = true;
             // 
@@ -160,7 +160,6 @@
             this.decryptRB.Name = "decryptRB";
             this.decryptRB.Size = new System.Drawing.Size(104, 17);
             this.decryptRB.TabIndex = 1;
-            this.decryptRB.TabStop = true;
             this.decryptRB.Text = "Дешифрование";
             this.decryptRB.UseVisualStyleBackColor = true;
             // 
@@ -321,15 +320,24 @@
             this.groupBox6.Controls.Add(this.rb);
             this.groupBox6.Location = new System.Drawing.Point(12, 205);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(571, 40);
+            this.groupBox6.Size = new System.Drawing.Size(571, 41);
             this.groupBox6.TabIndex = 3;
             this.groupBox6.TabStop = false;
+            // 
+            // SpeedLabel
+            // 
+            this.SpeedLabel.AutoSize = true;
+            this.SpeedLabel.Location = new System.Drawing.Point(12, 249);
+            this.SpeedLabel.Name = "SpeedLabel";
+            this.SpeedLabel.Size = new System.Drawing.Size(0, 13);
+            this.SpeedLabel.TabIndex = 0;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(595, 256);
+            this.ClientSize = new System.Drawing.Size(595, 270);
+            this.Controls.Add(this.SpeedLabel);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox6);
@@ -352,6 +360,7 @@
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -383,6 +392,7 @@
         private System.Windows.Forms.TextBox passTB;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.GroupBox groupBox6;
+        private System.Windows.Forms.Label SpeedLabel;
     }
 }
 

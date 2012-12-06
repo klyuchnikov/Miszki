@@ -15,6 +15,7 @@ namespace Lab2
     {
         private FeistelNetwork crypter;
         private Timer timer;
+        private DateTime oldTime;
 
         public MainForm()
         {
@@ -31,6 +32,8 @@ namespace Lab2
         {
             if (crypter.MaxValueProcess == 0)
                 return;
+            var diff = DateTime.Now - oldTime;
+            SpeedLabel.Text = string.Format("Скорость: {0:N} симв/сек", (crypter.CurrentValueProcess / diff.TotalSeconds));
             rb.Value = (int)((crypter.CurrentValueProcess / (double)crypter.MaxValueProcess) * 1000);
             if (crypter.CurrentValueProcess == crypter.MaxValueProcess - 1)
             {
@@ -38,6 +41,7 @@ namespace Lab2
                 rb.Maximum = 1000;
                 rb.Minimum = 0;
                 rb.Value = rb.Maximum;
+                SpeedLabel.Text = string.Format("Время выполнения: {0} секунд, {1:N} символов", (DateTime.Now - oldTime).TotalSeconds, crypter.MaxValueProcess);
                 groupBox1.Enabled = true;
                 groupBox2.Enabled = true;
                 groupBox3.Enabled = true;
@@ -119,6 +123,7 @@ namespace Lab2
             groupBox4.Enabled = false;
             groupBox5.Enabled = false;
             groupBox6.Enabled = false;
+            oldTime = DateTime.Now;
             if (encryptRB.Checked)
                 crypter.Encrypt(inputBrowseTB.Text, outputBrowseTB.Text, passTB.Text);
             else if (decryptRB.Checked)
