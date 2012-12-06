@@ -26,6 +26,7 @@ namespace Lab2
             //    rb.Style = ProgressBarStyle.Continuous;
             rb.Minimum = 0;
             rb.Maximum = 1000;
+
         }
 
         private void timer_Tick(object sender, EventArgs e)
@@ -125,9 +126,9 @@ namespace Lab2
             groupBox6.Enabled = false;
             oldTime = DateTime.Now;
             if (encryptRB.Checked)
-                crypter.Encrypt(inputBrowseTB.Text, outputBrowseTB.Text, passTB.Text);
+                crypter.EncryptAsync(inputBrowseTB.Text, outputBrowseTB.Text, passTB.Text);
             else if (decryptRB.Checked)
-                crypter.Decrypt(inputBrowseTB.Text, outputBrowseTB.Text, passTB.Text);
+                crypter.DecryptAsync(inputBrowseTB.Text, outputBrowseTB.Text, passTB.Text);
 
 
         }

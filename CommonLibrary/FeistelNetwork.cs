@@ -11,17 +11,15 @@ namespace CommonLibrary
     /// <summary>
     /// Сеть Фейстеля - методов построения блочных шифров
     /// </summary>
-    public class FeistelNetwork
+    public class FeistelNetwork : CrypterBlocks, IComplited
     {
 
         private delegate void CryptFunctionDelegate(string inputFile, string outputFile, bool reverse, string key);
         private CryptFunctionDelegate cfDelegate;
 
-        public int MaxValueProcess { get; private set; }
 
         public int SubBlocks { get; private set; }
 
-        public int CurrentValueProcess { get; private set; }
 
         /// <summary>
         /// Количество иттераций
@@ -97,58 +95,123 @@ namespace CommonLibrary
         {
             var round = reverse ? Rounds : 1;
             var subblockscount = 3;
-            var file = File.ReadAllBytes(inputFile);
+            //  var file = File.ReadAllBytes(inputFile);
             var gen = new CongruentialGenerator(MaHash8v64.GetHashCode(key));
             var keys = new byte[subblockscount];
             for (var i = 0; i < keys.Length - 1; i++)
                 keys[i] = (byte)gen.Next(1, BlockLenth / 2 - keys.Sum(a => a) - (subblockscount - i - 1));
             keys[keys.Length - 1] = (byte)(BlockLenth / 2 - keys.Sum(a => a));
+            var inputstream = File.OpenRead(inputFile);
+            var sr = new BinaryReader(inputstream);
 
 
-            this.MaxValueProcess = (int)(file.Length * Rounds);
+            var outputstream = File.OpenWrite(outputFile);
 
-            var lenthBlocks = Math.Truncate((double)(file.Length / BlockLenth));
-            for (byte k = 0; k < Rounds; k++)
+            var wr = new BinaryWriter(outputstream);
+
+
+
+            this.CurrentValueProcess = 0;
+            this.MaxValueProcess = (int)(inputstream.Length * Rounds);
+
+            var lenthBlocks = Math.Truncate((double)(inputstream.Length / BlockLenth));
+            while (true)
             {
-                for (var i = 0; i < lenthBlocks * BlockLenth; i += BlockLenth)
+                var buffer = sr.ReadBytes(this.BlockLenth);
+                if (buffer.Length == BlockLenth)
+                    for (byte k = 0; k < Rounds; k++)
+                    {
+                        if (k < round - 1)
+                            XORl(ref buffer, F(buffer, keys, 0), 0);
+                        else
+                            XORr(ref buffer, F(buffer, keys, 0), 0);
+
+                    }
+                else
                 {
-                    if (k < round - 1)
-                        XORl(ref file, F(file, keys, i), i);
-                    else
-                        XORr(ref file, F(file, keys, i), i);
-                    this.CurrentValueProcess += 10;
+                    this.CurrentValueProcess = this.MaxValueProcess - 1;
+                    wr.Write(buffer);
+                    break;
                 }
-                this.CurrentValueProcess = (k + 1) * file.Length - 1;
+                wr.Write(buffer);
+                this.CurrentValueProcess+=10;
+                //this.CurrentValueProcess = (int)((k + 1) * inputstream.Length - 1);
             }
-            File.WriteAllBytes(outputFile, file);
+            inputstream.Close();
+            outputstream.Close();
+            // File.WriteAllBytes(outputFile, file);
         }
 
-        /// <summary>
-        /// Шифрование
-        /// </summary>
-        /// <param name="file">входной массив байтов</param>
-        /// <param name="key"> ключ</param>
-        public void Encrypt(string inputFile, string outputFile, string key)
+
+        public override string Encrypt(string str, string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void EncryptAsync(string str, string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string Decrypt(string str, string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string DecryptAsync(string str, string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override byte[] Encrypt(byte[] str, string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override byte[] EncryptAsync(byte[] str, string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override byte[] Decrypt(byte[] str, string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override byte[] DecryptAsync(byte[] str, string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void EncryptAsync(string inputFile, string outputFile, string key)
         {
             IAsyncResult res = null;
             res = cfDelegate.BeginInvoke(inputFile, outputFile, true, key, delegate
             {
                 cfDelegate.EndInvoke(res);
+                if (EncryptComplitedEvent != null)
+                    EncryptComplitedEvent(key);
             }, null);
         }
 
-        /// <summary>
-        /// Дешифрование
-        /// </summary>
-        /// <param name="file">входной массив байтов</param>
-        /// <param name="key">ключ</param>
-        public void Decrypt(string inputFile, string outputFile, string key)
+        public override void DecryptAsync(string inputFile, string outputFile, string key)
         {
             IAsyncResult res = null;
             res = cfDelegate.BeginInvoke(inputFile, outputFile, false, key, delegate
             {
                 cfDelegate.EndInvoke(res);
+                if (DecryptComplitedEvent != null)
+                    DecryptComplitedEvent(key);
             }, null);
         }
+
+        public override byte[] F(byte[] data, int[] key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public event ComplitedHandler DecryptComplitedEvent;
+
+        public event ComplitedHandler EncryptComplitedEvent;
     }
 }
