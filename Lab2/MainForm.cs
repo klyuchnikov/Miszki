@@ -22,12 +22,10 @@ namespace Lab2
             InitializeComponent();
             timer = new Timer { Interval = 10 };
             timer.Tick += new EventHandler(timer_Tick);
-            //   rb.MarqueeAnimationSpeed = 10;
-            //    rb.Style = ProgressBarStyle.Continuous;
             rb.Minimum = 0;
             rb.Maximum = 1000;
-
         }
+
 
         private void timer_Tick(object sender, EventArgs e)
         {
@@ -113,7 +111,7 @@ namespace Lab2
             var lenthBlock = byte.Parse(lenthBlockTB.Text);
             var round = byte.Parse(roundTB.Text);
             var subblocks = byte.Parse(subblockTB.Text);
-            crypter = new FeistelNetwork(lenthBlock, round, subblocks);
+            crypter = new FeistelNetwork(lenthBlock, round, subblocks, passTB.Text);
 
             timer.Stop();
             timer.Start();
@@ -126,9 +124,9 @@ namespace Lab2
             groupBox6.Enabled = false;
             oldTime = DateTime.Now;
             if (encryptRB.Checked)
-                crypter.EncryptAsync(inputBrowseTB.Text, outputBrowseTB.Text, passTB.Text);
+                crypter.EncryptAsync(inputBrowseTB.Text, outputBrowseTB.Text);
             else if (decryptRB.Checked)
-                crypter.DecryptAsync(inputBrowseTB.Text, outputBrowseTB.Text, passTB.Text);
+                crypter.DecryptAsync(inputBrowseTB.Text, outputBrowseTB.Text);
 
 
         }

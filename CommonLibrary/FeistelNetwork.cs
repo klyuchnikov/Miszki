@@ -11,15 +11,14 @@ namespace CommonLibrary
     /// <summary>
     /// Сеть Фейстеля - методов построения блочных шифров
     /// </summary>
-    public class FeistelNetwork : CrypterBlocks, IComplited
+    public class FeistelNetwork : CrypterBlocks
     {
+        private byte[] keys;
 
-        private delegate void CryptFunctionDelegate(string inputFile, string outputFile, bool reverse, string key);
-        private CryptFunctionDelegate cfDelegate;
-
-
+        /// <summary>
+        /// Количество подблоков
+        /// </summary>
         public int SubBlocks { get; private set; }
-
 
         /// <summary>
         /// Количество иттераций
@@ -30,34 +29,40 @@ namespace CommonLibrary
         /// </summary>
         public byte BlockLenth { get; private set; }
 
+
         /// <summary>
         /// Создание экземпляра
         /// </summary>
         /// <param name="BlockLenth">Длина блока</param>
         /// <param name="rounds">Количество иттераций</param>
-        public FeistelNetwork(byte BlockLenth, byte rounds, byte subBlocks)
+        public FeistelNetwork(byte BlockLenth, byte rounds, byte subBlocks, string key)
         {
-
             this.BlockLenth = BlockLenth;
             this.Rounds = rounds;
             this.SubBlocks = subBlocks;
-            cfDelegate = new CryptFunctionDelegate(this.Crypt);
+            this.Password = key;
+            GenKeys(key);
         }
 
         /// <summary>
-        /// Функция преобразования данных, зависимая от ключа 
+        /// Генерация псевдослучайных ключей, зависимых от входного ключа-пароля
         /// </summary>
-        /// <param name="data">Массив данных</param>
-        /// <param name="key">Ключ</param>
-        /// <param name="ind"> </param>
-        /// <returns></returns>
+        /// <param name="key"></param>
+        private void GenKeys(string key)
+        {
+            var gen = new CongruentialGenerator(MaHash8v64.GetHashCode(key));
+            keys = new byte[this.SubBlocks];
+            for (var i = 0; i < keys.Length - 1; i++)
+                keys[i] = (byte)gen.Next(1, this.BlockLenth / 2 - keys.Sum(a => a) - (this.SubBlocks - i - 1));
+            keys[keys.Length - 1] = (byte)(this.BlockLenth / 2 - keys.Sum(a => a));
+        }
 
         /// <summary>
-        /// Функция ^ (xor) между двумя массивами байтов
+        /// Функция преобразования данных, сеть Фейстеля, изменненной левой ^ правой части и присваивание к левой части
         /// </summary>
-        /// <param name="a">Массив данных</param>
-        /// <param name="b">Массив данных</param>
-        /// <returns>a ^ b</returns>
+        /// <param name="data">массив данных</param>
+        /// <param name="lk">преобразованный массив левой части</param>
+        /// <param name="indL">индекс начала</param>
         private void XORl(ref byte[] data, byte[] lk, int indL)
         {
             byte temp;
@@ -69,13 +74,26 @@ namespace CommonLibrary
             }
         }
 
+        /// <summary>
+        /// Функция преобразования данных, сеть Фейстеля, изменненной левой ^ правой части и присваивание к правой части
+        /// </summary>
+        /// <param name="data">массив данных</param>
+        /// <param name="lk">преобразованный массив левой части</param>
+        /// <param name="indL">индекс начала</param>
         private void XORr(ref byte[] data, byte[] lk, int indL)
         {
             for (var i = 0; i < BlockLenth / 2; i++)
                 data[i + indL + BlockLenth / 2] = (byte)(data[i + indL + BlockLenth / 2] ^ lk[i]);
         }
 
-        private byte[] F(byte[] data, byte[] keys, int ind)
+        /// <summary>
+        /// Функция изменения блока данных - перестановка 
+        /// </summary>
+        /// <param name="data">массив данных</param>
+        /// <param name="keys"массив ключей></param>
+        /// <param name="ind">индекс начала</param>
+        /// <returns></returns>
+        private byte[] F(byte[] data, int ind)
         {
             var clone = new byte[BlockLenth / 2];
             for (var i = 0; i < BlockLenth / 2 - keys[0]; i++)
@@ -86,47 +104,28 @@ namespace CommonLibrary
         }
 
         /// <summary>
-        /// Общая функция преобразования входного массива байтов 
+        /// Общая функция преобразования входного массива байтов
         /// </summary>
-        /// <param name="file">входной массив байтов</param>
-        /// <param name="reverse">если false - шифрация, true - дешифрация</param>
+        /// <param name="inputFile">путь входного файла</param>
+        /// <param name="outputFile">путь выходного файла</param>
+        /// <param name="isEncrypt">если true - шифрация, false - дешифрация</param>
         /// <param name="key">ключ</param>
-        private void Crypt(string inputFile, string outputFile, bool reverse, string key)
+        protected override void Crypt(string inputFile, string outputFile, bool isEncrypt)
         {
-            var round = reverse ? Rounds : 1;
-            var subblockscount = 3;
-            //  var file = File.ReadAllBytes(inputFile);
-            var gen = new CongruentialGenerator(MaHash8v64.GetHashCode(key));
-            var keys = new byte[subblockscount];
-            for (var i = 0; i < keys.Length - 1; i++)
-                keys[i] = (byte)gen.Next(1, BlockLenth / 2 - keys.Sum(a => a) - (subblockscount - i - 1));
-            keys[keys.Length - 1] = (byte)(BlockLenth / 2 - keys.Sum(a => a));
             var inputstream = File.OpenRead(inputFile);
             var sr = new BinaryReader(inputstream);
 
-
             var outputstream = File.OpenWrite(outputFile);
-
             var wr = new BinaryWriter(outputstream);
-
-
 
             this.CurrentValueProcess = 0;
             this.MaxValueProcess = (int)(inputstream.Length * Rounds);
 
-            var lenthBlocks = Math.Truncate((double)(inputstream.Length / BlockLenth));
             while (true)
             {
                 var buffer = sr.ReadBytes(this.BlockLenth);
                 if (buffer.Length == BlockLenth)
-                    for (byte k = 0; k < Rounds; k++)
-                    {
-                        if (k < round - 1)
-                            XORl(ref buffer, F(buffer, keys, 0), 0);
-                        else
-                            XORr(ref buffer, F(buffer, keys, 0), 0);
-
-                    }
+                    buffer = CryptBlock(isEncrypt, buffer);
                 else
                 {
                     this.CurrentValueProcess = this.MaxValueProcess - 1;
@@ -134,84 +133,31 @@ namespace CommonLibrary
                     break;
                 }
                 wr.Write(buffer);
-                this.CurrentValueProcess+=10;
-                //this.CurrentValueProcess = (int)((k + 1) * inputstream.Length - 1);
+                this.CurrentValueProcess += 10;
             }
             inputstream.Close();
             outputstream.Close();
-            // File.WriteAllBytes(outputFile, file);
         }
 
-
-        public override string Encrypt(string str, string key)
+        /// <summary>
+        /// Основная функция изменения блока данных по данному методу
+        /// </summary>
+        /// <param name="isEncrypt">если true - шифрация, false - дешифрация</param>
+        /// <param name="buffer">массив данных</param>
+        /// <returns></returns>
+        protected override byte[] CryptBlock(bool isEncrypt, byte[] buffer)
         {
-            throw new NotImplementedException();
-        }
-
-        public override void EncryptAsync(string str, string key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override string Decrypt(string str, string key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override string DecryptAsync(string str, string key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override byte[] Encrypt(byte[] str, string key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override byte[] EncryptAsync(byte[] str, string key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override byte[] Decrypt(byte[] str, string key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override byte[] DecryptAsync(byte[] str, string key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void EncryptAsync(string inputFile, string outputFile, string key)
-        {
-            IAsyncResult res = null;
-            res = cfDelegate.BeginInvoke(inputFile, outputFile, true, key, delegate
+            var round = isEncrypt ? this.Rounds : 1;
+            for (byte k = 0; k < this.Rounds; k++)
             {
-                cfDelegate.EndInvoke(res);
-                if (EncryptComplitedEvent != null)
-                    EncryptComplitedEvent(key);
-            }, null);
+                if (k < this.Rounds - 1)
+                    XORl(ref buffer, F(buffer, 0), 0);
+                else
+                    XORr(ref buffer, F(buffer, 0), 0);
+                round += isEncrypt ? -1 : 1;
+            }
+            return buffer;
         }
 
-        public override void DecryptAsync(string inputFile, string outputFile, string key)
-        {
-            IAsyncResult res = null;
-            res = cfDelegate.BeginInvoke(inputFile, outputFile, false, key, delegate
-            {
-                cfDelegate.EndInvoke(res);
-                if (DecryptComplitedEvent != null)
-                    DecryptComplitedEvent(key);
-            }, null);
-        }
-
-        public override byte[] F(byte[] data, int[] key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public event ComplitedHandler DecryptComplitedEvent;
-
-        public event ComplitedHandler EncryptComplitedEvent;
     }
 }
