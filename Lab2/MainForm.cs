@@ -13,7 +13,7 @@ namespace Lab2
 {
     public partial class MainForm : Form
     {
-        private FeistelNetwork crypter;
+        private CrypterBlocks crypter;
         private Timer timer;
         private DateTime oldTime;
 
@@ -111,7 +111,10 @@ namespace Lab2
             var lenthBlock = byte.Parse(lenthBlockTB.Text);
             var round = byte.Parse(roundTB.Text);
             var subblocks = byte.Parse(subblockTB.Text);
-            crypter = new FeistelNetwork(lenthBlock, round, subblocks, passTB.Text);
+            if (ecbRB.Checked)
+                crypter = new ECB(lenthBlock, subblocks, passTB.Text);
+            else
+                crypter = new FeistelNetwork(lenthBlock, subblocks, passTB.Text, round);
 
             timer.Stop();
             timer.Start();

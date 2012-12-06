@@ -58,14 +58,7 @@ namespace CommonLibrary
         /// Генерация псевдослучайных ключей, зависимых от входного ключа-пароля
         /// </summary>
         /// <param name="key"></param>
-        protected void GenKeys(string key)
-        {
-            var gen = new CongruentialGenerator(MaHash8v64.GetHashCode(key));
-            keys = new byte[this.SubBlocks];
-            for (var i = 0; i < keys.Length - 1; i++)
-                keys[i] = (byte)gen.Next(1, this.BlockLenth / 2 - keys.Sum(a => a) - (this.SubBlocks - i - 1));
-            keys[keys.Length - 1] = (byte)(this.BlockLenth / 2 - keys.Sum(a => a));
-        }
+        protected abstract void GenKeys(string key);
 
 
         /// <summary>

@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Crypter.cs" />
+    <Compile Include="ECB.cs" />
     <Compile Include="FeistelNetwork.cs" />
     <Compile Include="Generator.cs" />
     <Compile Include="MaHash8v64.cs" />
