@@ -2,13 +2,33 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Threading;
 
 namespace CommonLibrary
 {
+    /// <summary>
+    /// Пользовательский аттрибут, применяемый к свойствам класса, которые являются настройками метода и вписываются в кодируемый файл
+    /// </summary>
+    public class ParametrCryptAttribute : Attribute
+    { }
+
+    public enum CryptResult
+    {
+        /// <summary>
+        /// Усшнешно
+        /// </summary>
+        Success,
+        /// <summary>
+        /// Несовпадение значений параметров записанных в файл с заданными
+        /// </summary>
+        MismatchValueParameters
+    }
+
     public abstract class CrypterBlocks
     {
-        public delegate void ComplitedHandler(string password);
+        public delegate void ComplitedHandler(CryptResult cryptResult, string password);
         public delegate void ComplitedStringHandler(string result);
         public delegate void ComplitedBytesHandler(byte[] result);
 
@@ -20,7 +40,7 @@ namespace CommonLibrary
         public event ComplitedHandler EncryptComplitedEvent;
 
 
-        protected delegate void CryptFunctionDelegate(string inputFile, string outputFile, bool reverse);
+        protected delegate CryptResult CryptFunctionDelegate(string inputFile, string outputFile, bool reverse);
         protected delegate void CryptStringFunctionDelegate(ref string resstr);
         protected delegate void CryptBytesFunctionDelegate(byte[] data);
 
@@ -36,12 +56,14 @@ namespace CommonLibrary
         /// <summary>
         /// Количество подблоков
         /// </summary>
-        public int SubBlocks { get; protected set; }
+        [ParametrCryptAttribute]
+        public byte SubBlocks { get; protected set; }
 
 
         /// <summary>
         /// Длина блока
         /// </summary>
+        [ParametrCryptAttribute]
         public byte BlockLenth { get; protected set; }
 
 
@@ -76,17 +98,48 @@ namespace CommonLibrary
         /// <param name="outputFile">путь выходного файла</param>
         /// <param name="isEncrypt">если true - шифрация, false - дешифрация</param>
         /// <param name="key">ключ</param>
-        protected virtual void Crypt(string inputFile, string outputFile, bool isEncrypt)
+        protected virtual CryptResult Crypt(string inputFile, string outputFile, bool isEncrypt)
         {
             var inputstream = File.OpenRead(inputFile);
             var sr = new BinaryReader(inputstream);
 
-            var outputstream = File.OpenWrite(outputFile);
-            var wr = new BinaryWriter(outputstream);
+            FileStream outputstream = null;
+            BinaryWriter wr = null;
 
             this.CurrentValueProcess = 0;
             this.MaxValueProcess = (int)(inputstream.Length);
 
+            if (isEncrypt)
+            {
+                outputstream = File.OpenWrite(outputFile);
+                wr = new BinaryWriter(outputstream);
+                var enc = MaHash8v64.GetHashCode(this.Password);
+                // var bytesPass = Encoding.Unicode.GetBytes(enc);
+                wr.Write(enc);
+                var properties = this.GetType().GetProperties().Where(a => a.GetCustomAttributes(true).OfType<ParametrCryptAttribute>().Count() != 0).ToArray();
+                foreach (var p in properties)
+                    wr.Write((byte)p.GetValue(this, null));
+            }
+            else
+            {
+                var hashPass = sr.ReadUInt32();
+
+                var properties = this.GetType().GetProperties().Where(a => a.GetCustomAttributes(true).OfType<ParametrCryptAttribute>().Count() != 0).ToArray();
+
+                var paramsValue = new byte[properties.Length];
+                for (var i = 0; i < properties.Length; i++)
+                    paramsValue[i] = sr.ReadByte();
+                if (hashPass != MaHash8v64.GetHashCode(this.Password))
+                    return CryptResult.MismatchValueParameters;
+                for (var i = 0; i < properties.Length; i++)
+                    if (paramsValue[i] != (byte)properties[i].GetValue(this, null))
+                        return CryptResult.MismatchValueParameters;
+            }
+            if (wr == null)
+            {
+                outputstream = File.OpenWrite(outputFile);
+                wr = new BinaryWriter(outputstream);
+            }
             while (true)
             {
                 var buffer = sr.ReadBytes(this.BlockLenth);
@@ -103,6 +156,7 @@ namespace CommonLibrary
             }
             inputstream.Close();
             outputstream.Close();
+            return CryptResult.Success;
         }
 
         protected CryptStringFunctionDelegate GetCryptStringDelegate(bool isEncrypt)
@@ -124,12 +178,16 @@ namespace CommonLibrary
         public virtual void EncryptAsync(string inputFile, string outputFile)
         {
             IAsyncResult res = null;
+            var syncCurrent = SynchronizationContext.Current;
             var cfDelegate = new CryptFunctionDelegate(this.Crypt);
             res = cfDelegate.BeginInvoke(inputFile, outputFile, true, delegate
             {
-                cfDelegate.EndInvoke(res);
-                if (EncryptComplitedEvent != null)
-                    EncryptComplitedEvent(Password);
+                syncCurrent.Send(delegate
+                {
+                    var cryprres = cfDelegate.EndInvoke(res);
+                    if (EncryptComplitedEvent != null)
+                        EncryptComplitedEvent(cryprres, Password);
+                }, null);
             }, null);
         }
 
@@ -137,11 +195,16 @@ namespace CommonLibrary
         {
             IAsyncResult res = null;
             var cfDelegate = new CryptFunctionDelegate(this.Crypt);
+            var syncCurrent = SynchronizationContext.Current;
             res = cfDelegate.BeginInvoke(inputFile, outputFile, false, delegate
             {
-                cfDelegate.EndInvoke(res);
-                if (DecryptComplitedEvent != null)
-                    DecryptComplitedEvent(Password);
+
+                syncCurrent.Send(delegate
+                {
+                    var cryprres = cfDelegate.EndInvoke(res);
+                    if (DecryptComplitedEvent != null)
+                        DecryptComplitedEvent(cryprres, Password);
+                }, null);
             }, null);
         }
 
@@ -160,11 +223,15 @@ namespace CommonLibrary
 
             var deleg = GetCryptStringDelegate(true);
 
+            var syncCurrent = SynchronizationContext.Current;
             res = deleg.BeginInvoke(ref resstr, delegate
             {
-                deleg.EndInvoke(ref resstr, res);
-                if (EncryptStringComplitedEvent != null)
-                    EncryptStringComplitedEvent(resstr);
+                syncCurrent.Send(delegate
+                {
+                    deleg.EndInvoke(ref resstr, res);
+                    if (EncryptStringComplitedEvent != null)
+                        EncryptStringComplitedEvent(resstr);
+                }, null);
             }, null);
         }
 
@@ -181,12 +248,15 @@ namespace CommonLibrary
             var resstr = str + "";
 
             var deleg = GetCryptStringDelegate(false);
-
+            var syncCurrent = SynchronizationContext.Current;
             res = deleg.BeginInvoke(ref resstr, delegate
             {
-                deleg.EndInvoke(ref resstr, res);
-                if (DecryptStringComplitedEvent != null)
-                    DecryptStringComplitedEvent(resstr);
+                syncCurrent.Send(delegate
+                {
+                    deleg.EndInvoke(ref resstr, res);
+                    if (DecryptStringComplitedEvent != null)
+                        DecryptStringComplitedEvent(resstr);
+                }, null);
             }, null);
         }
 
@@ -202,11 +272,16 @@ namespace CommonLibrary
 
             var deleg = GetCryptBytesDelegate(true);
             var clone = (byte[])data.Clone();
+            var syncCurrent = SynchronizationContext.Current;
+
             res = deleg.BeginInvoke(clone, delegate
             {
-                deleg.EndInvoke(res);
-                if (EncryptBytesComplitedEvent != null)
-                    EncryptBytesComplitedEvent(clone);
+                syncCurrent.Send(delegate
+                {
+                    deleg.EndInvoke(res);
+                    if (EncryptBytesComplitedEvent != null)
+                        EncryptBytesComplitedEvent(clone);
+                }, null);
             }, null);
         }
 
@@ -222,11 +297,15 @@ namespace CommonLibrary
 
             var deleg = GetCryptBytesDelegate(false);
             var clone = (byte[])data.Clone();
+            var syncCurrent = SynchronizationContext.Current;
             res = deleg.BeginInvoke(clone, delegate
             {
-                deleg.EndInvoke(res);
-                if (DecryptBytesComplitedEvent != null)
-                    DecryptBytesComplitedEvent(clone);
+                syncCurrent.Send(delegate
+                {
+                    deleg.EndInvoke(res);
+                    if (DecryptBytesComplitedEvent != null)
+                        DecryptBytesComplitedEvent(clone);
+                }, null);
             }, null);
         }
 
