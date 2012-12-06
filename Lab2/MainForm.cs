@@ -82,7 +82,7 @@ namespace Lab2
             if (subblockTB.Text == "" || lenthBlockTB.Text == "")
                 return;
             if (int.Parse(subblockTB.Text) <= int.Parse(lenthBlockTB.Text)) return;
-            MessageBox.Show("Количество подблоков не может быть больше длины блока.");
+            MessageBox.Show("Количество подблоков не может быть больше поливины длины блока.");
             subblockTB.Text = "";
         }
 
