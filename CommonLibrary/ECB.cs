@@ -11,6 +11,7 @@ namespace CommonLibrary
             : base(BlockLenth, subBlocks, pass)
         {
             inds = new int[this.SubBlocks];
+            keysDecrypt = new byte[this.SubBlocks];
             for (int i = 0; i < this.SubBlocks; i++)
                 inds[i] = -1;
             var gen = new CongruentialGenerator(MaHash8v64.GetHashCode(this.Password));
@@ -22,20 +23,30 @@ namespace CommonLibrary
                     newValue = (byte)gen.Next(0, this.SubBlocks - 1);
                 } while (inds[newValue] != -1 || (newValue == 0 && i == 0));
                 inds[newValue] = i;
-            } for (int i = 0; i < this.SubBlocks; i++)
+            }
+            for (int i = 0; i < this.SubBlocks; i++)
+            {
                 if (inds[i] == -1)
                     inds[i] = this.SubBlocks - 1;
+                keysDecrypt[i] = keys[inds[i]];
+            }
         }
 
         private int[] inds;
+        private byte[] keysDecrypt;
         protected override byte[] CryptBlock(bool isEncrypt, byte[] buffer)
         {
             var newblock = new byte[BlockLenth];
             int ind = 0;
             for (int i = 0; i < this.SubBlocks; i++)
             {
-                for (int k = 0; k < keys[inds[i]]; k++)
-                    newblock[ind++] = buffer[keys.Take(inds[i]).Sum(a => a) + k];
+                if (isEncrypt)
+                    for (int k = 0; k < keys[inds[i]]; k++)
+                        newblock[ind++] = buffer[keys.Take(inds[i]).Sum(a => a) + k];
+                else
+                    for (int k = 0; k < keysDecrypt[inds[i]]; k++)
+                        newblock[ind++] = buffer[keysDecrypt.Take(inds[i]).Sum(a => a) + k];
+
             }
             return newblock;
         }

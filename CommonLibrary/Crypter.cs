@@ -55,7 +55,7 @@ namespace CommonLibrary
             GenKeys(pass);
         }
         /// <summary>
-        /// Генерация псевдослучайных ключей, зависимых от входного ключа-пароля
+        /// Генерация длины блоков псевдослучайным генератором, зависимым от входного ключа-пароля
         /// </summary>
         /// <param name="key"></param>
         protected abstract void GenKeys(string key);
