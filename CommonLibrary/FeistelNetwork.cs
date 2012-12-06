@@ -17,6 +17,7 @@ namespace CommonLibrary
         /// <summary>
         /// Количество иттераций
         /// </summary>
+        [ParametrCryptAttribute]
         public byte Rounds { get; private set; }
 
         /// <summary>
@@ -94,14 +95,21 @@ namespace CommonLibrary
         /// <returns></returns>
         protected override byte[] CryptBlock(bool isEncrypt, byte[] buffer)
         {
-            var round = isEncrypt ? this.Rounds : 1;
-            for (byte k = 0; k < this.Rounds; k++)
+            if (buffer.Length == this.BlockLenth)
             {
-                if (k < this.Rounds - 1)
-                    XORl(ref buffer, F(buffer, 0), 0);
-                else
-                    XORr(ref buffer, F(buffer, 0), 0);
-                round += isEncrypt ? -1 : 1;
+                var round = isEncrypt ? this.Rounds : 1;
+                for (byte k = 0; k < this.Rounds; k++)
+                {
+                    if (k < this.Rounds - 1)
+                        XORl(ref buffer, F(buffer, 0), 0);
+                    else
+                        XORr(ref buffer, F(buffer, 0), 0);
+                    round += isEncrypt ? -1 : 1;
+                }
+            }
+            else
+            {
+ 
             }
             return buffer;
         }
