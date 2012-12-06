@@ -19,18 +19,32 @@ namespace Lab2
         public MainForm()
         {
             InitializeComponent();
-            timer = new Timer { Interval = 100 };
+            timer = new Timer { Interval = 10 };
             timer.Tick += new EventHandler(timer_Tick);
-
+            //   rb.MarqueeAnimationSpeed = 10;
+            //    rb.Style = ProgressBarStyle.Continuous;
+            rb.Minimum = 0;
+            rb.Maximum = 1000;
         }
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            rb.Maximum = crypter.MaxValueProcess;
-            rb.Minimum = 0;
-            rb.Value = crypter.CurrentValueProcess;
-            if (crypter.CurrentValueProcess == crypter.MaxValueProcess)
+            if (crypter.MaxValueProcess == 0)
+                return;
+            rb.Value = (int)((crypter.CurrentValueProcess / (double)crypter.MaxValueProcess) * 1000);
+            if (crypter.CurrentValueProcess == crypter.MaxValueProcess - 1)
+            {
                 timer.Stop();
+                rb.Maximum = 1000;
+                rb.Minimum = 0;
+                rb.Value = rb.Maximum;
+                groupBox1.Enabled = true;
+                groupBox2.Enabled = true;
+                groupBox3.Enabled = true;
+                groupBox4.Enabled = true;
+                groupBox5.Enabled = true;
+                groupBox6.Enabled = true;
+            }
         }
 
         private void onlyDigit_KeyPress(object sender, KeyPressEventArgs e)
@@ -76,12 +90,39 @@ namespace Lab2
                 MessageBox.Show("Задайте пароль.");
                 return;
             }
+            if (subblockTB.Text == "")
+            {
+                MessageBox.Show("Задайте количество подблоков.");
+                return;
+            }
+            if (lenthBlockTB.Text == "")
+            {
+                MessageBox.Show("Задайте длину блока.");
+                return;
+            }
+            if (lenthBlockTB.Text == "")
+            {
+                MessageBox.Show("Задайте колличество иттераций.");
+                return;
+            }
             var lenthBlock = byte.Parse(lenthBlockTB.Text);
             var round = byte.Parse(roundTB.Text);
-            crypter = new FeistelNetwork(lenthBlock, round);
+            var subblocks = byte.Parse(subblockTB.Text);
+            crypter = new FeistelNetwork(lenthBlock, round, subblocks);
 
+            timer.Stop();
             timer.Start();
-            crypter.Encrypt(inputBrowseTB.Text, outputBrowseTB.Text, passTB.Text);
+
+            groupBox1.Enabled = false;
+            groupBox2.Enabled = false;
+            groupBox3.Enabled = false;
+            groupBox4.Enabled = false;
+            groupBox5.Enabled = false;
+            groupBox6.Enabled = false;
+            if (encryptRB.Checked)
+                crypter.Encrypt(inputBrowseTB.Text, outputBrowseTB.Text, passTB.Text);
+            else if (decryptRB.Checked)
+                crypter.Decrypt(inputBrowseTB.Text, outputBrowseTB.Text, passTB.Text);
 
 
         }

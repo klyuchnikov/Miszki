@@ -13,10 +13,12 @@ namespace CommonLibrary
     public class FeistelNetwork
     {
 
-        private delegate void CryptFunctionDelegate(string inputFile, string outputFile, string key);
+        private delegate void CryptFunctionDelegate(string inputFile, string outputFile, bool reverse, string key);
         private CryptFunctionDelegate cfDelegate;
 
         public int MaxValueProcess { get; private set; }
+
+        public int SubBlocks { get; private set; }
 
         public int CurrentValueProcess { get; private set; }
 
@@ -34,10 +36,11 @@ namespace CommonLibrary
         /// </summary>
         /// <param name="BlockLenth">Длина блока</param>
         /// <param name="rounds">Количество иттераций</param>
-        public FeistelNetwork(byte BlockLenth, byte rounds)
+        public FeistelNetwork(byte BlockLenth, byte rounds, byte subBlocks)
         {
             this.BlockLenth = BlockLenth;
             this.Rounds = rounds;
+            this.SubBlocks = subBlocks;
             cfDelegate = new CryptFunctionDelegate(this.Crypt);
         }
 
@@ -61,7 +64,7 @@ namespace CommonLibrary
          /// <param name="b">Массив данных</param>
          /// <returns>a ^ b</returns>
        */
-        private void XORk(ref byte[] data, byte[] lk, int indL)
+        private void XORl(ref byte[] data, byte[] lk, int indL)
         {
             byte temp;
             for (var i = 0; i < BlockLenth / 2; i++)
@@ -71,14 +74,14 @@ namespace CommonLibrary
                 data[i + indL] = (byte)(temp ^ lk[i]);
             }
         }
-        private byte[] F(byte[] data, byte key)
+
+        private void XORr(ref byte[] data, byte[] lk, int indL)
         {
-            var clone = (byte[])data.Clone();
-            for (var i = 0; i < clone.Length; i++)
-                clone[i] = (byte)(data[i] ^ key);
-            return clone;
+            for (var i = 0; i < BlockLenth / 2; i++)
+                data[i + indL] = (byte)(data[i + indL + BlockLenth / 2] ^ lk[i]);
         }
-        private byte[] Fk(byte[] data, byte[] keys, int ind)
+
+        private byte[] F(byte[] data, byte[] keys, int ind)
         {
             var clone = new byte[BlockLenth / 2];
             for (var i = 0; i < BlockLenth / 2 - keys[0]; i++)
@@ -88,40 +91,15 @@ namespace CommonLibrary
             return clone;
         }
 
-
-        private string Fx(string str, byte[] keys)
-        {
-            var res = "";
-            for (var i = 1; i < keys.Length; i++)
-                res += str.Substring(keys.Take(i).Sum(a => a), keys[i]);
-            res = res + str.Substring(0, keys[0]);
-            return res;
-        }
-
-        private string XOR(string a, string b)
-        {
-            var res = "";
-            for (var i = 0; i < a.Length; i++)
-                res += (a[i] ^ b[i]);
-            return res;
-        }
-        /*
-        private byte[] XOR(byte[] a, byte[] b)
-        {
-            var res = new byte[a.Length];
-            for (var i = 0; i < a.Length; i++)
-                res[i] = (byte)(a[i] ^ b[i]);
-            return res;
-        }*/
-
         /// <summary>
         /// Общая функция преобразования входного массива байтов 
         /// </summary>
         /// <param name="file">входной массив байтов</param>
         /// <param name="reverse">если false - шифрация, true - дешифрация</param>
         /// <param name="key">ключ</param>
-        private void Crypt(string inputFile, string outputFile, string key)
+        private void Crypt(string inputFile, string outputFile, bool reverse, string key)
         {
+            var round = reverse ? Rounds : 1;
             var subblockscount = 3;
             var file = File.ReadAllBytes(inputFile);
             var gen = new CongruentialGenerator(MaHash8v64.GetHashCode(key));
@@ -133,16 +111,18 @@ namespace CommonLibrary
 
             this.MaxValueProcess = (int)(file.Length * Rounds);
 
-
-
             var lenthBlocks = Math.Truncate((double)(file.Length / BlockLenth));
             for (byte k = 0; k < Rounds; k++)
             {
                 for (var i = 0; i < lenthBlocks * BlockLenth; i += BlockLenth)
                 {
-                    XORk(ref file, Fk(file, keys, i), i);
-                    this.CurrentValueProcess = i + k * Rounds;
+                    if (k < round - 1)
+                        XORl(ref file, F(file, keys, i), i);
+                    else
+                        XORr(ref file, F(file, keys, i), i);
+                    this.CurrentValueProcess += 10;
                 }
+                this.CurrentValueProcess = (k + 1) * file.Length - 1;
             }
             File.WriteAllBytes(outputFile, file);
         }
@@ -154,7 +134,7 @@ namespace CommonLibrary
         /// <param name="key"> ключ</param>
         public void Encrypt(string inputFile, string outputFile, string key)
         {
-            cfDelegate.BeginInvoke(inputFile, outputFile, key, null, null);
+            cfDelegate.BeginInvoke(inputFile, outputFile, true, key, null, null);
         }
 
         /// <summary>
@@ -164,7 +144,7 @@ namespace CommonLibrary
         /// <param name="key">ключ</param>
         public void Decrypt(string inputFile, string outputFile, string key)
         {
-            cfDelegate.BeginInvoke(inputFile, outputFile, key, null, null);
+            cfDelegate.BeginInvoke(inputFile, outputFile, false, key, null, null);
         }
     }
 }

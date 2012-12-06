@@ -53,11 +53,13 @@
             this.rb = new System.Windows.Forms.ProgressBar();
             this.passTB = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
+            this.groupBox6.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -113,6 +115,7 @@
             // feistelRB
             // 
             this.feistelRB.AutoSize = true;
+            this.feistelRB.Checked = true;
             this.feistelRB.Location = new System.Drawing.Point(6, 19);
             this.feistelRB.Name = "feistelRB";
             this.feistelRB.Size = new System.Drawing.Size(104, 17);
@@ -164,6 +167,7 @@
             // encryptRB
             // 
             this.encryptRB.AutoSize = true;
+            this.encryptRB.Checked = true;
             this.encryptRB.Location = new System.Drawing.Point(6, 19);
             this.encryptRB.Name = "encryptRB";
             this.encryptRB.Size = new System.Drawing.Size(90, 17);
@@ -211,7 +215,7 @@
             this.inputBrowseTB.Name = "inputBrowseTB";
             this.inputBrowseTB.Size = new System.Drawing.Size(438, 20);
             this.inputBrowseTB.TabIndex = 2;
-            this.inputBrowseTB.Text = "K:\\Documents\\out.pdf";
+            this.inputBrowseTB.Text = "D:\\Documents\\расписание весенний семестр 2011.rar";
             // 
             // label3
             // 
@@ -261,7 +265,7 @@
             this.outputBrowseTB.Name = "outputBrowseTB";
             this.outputBrowseTB.Size = new System.Drawing.Size(438, 20);
             this.outputBrowseTB.TabIndex = 2;
-            this.outputBrowseTB.Text = "K:\\Documents\\out2.pdf";
+            this.outputBrowseTB.Text = "D:\\Documents\\outqq.rar";
             // 
             // brouseOutputFileB
             // 
@@ -275,7 +279,7 @@
             // 
             // startB
             // 
-            this.startB.Location = new System.Drawing.Point(502, 205);
+            this.startB.Location = new System.Drawing.Point(490, 11);
             this.startB.Name = "startB";
             this.startB.Size = new System.Drawing.Size(75, 23);
             this.startB.TabIndex = 5;
@@ -285,14 +289,16 @@
             // 
             // rb
             // 
-            this.rb.Location = new System.Drawing.Point(176, 205);
+            this.rb.Location = new System.Drawing.Point(164, 11);
+            this.rb.Maximum = 1000;
             this.rb.Name = "rb";
             this.rb.Size = new System.Drawing.Size(320, 23);
+            this.rb.Step = 1;
             this.rb.TabIndex = 6;
             // 
             // passTB
             // 
-            this.passTB.Location = new System.Drawing.Point(70, 207);
+            this.passTB.Location = new System.Drawing.Point(58, 13);
             this.passTB.Name = "passTB";
             this.passTB.Size = new System.Drawing.Size(100, 20);
             this.passTB.TabIndex = 7;
@@ -301,26 +307,36 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(19, 210);
+            this.label6.Location = new System.Drawing.Point(7, 16);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(45, 13);
             this.label6.TabIndex = 0;
             this.label6.Text = "Пароль";
             // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.label6);
+            this.groupBox6.Controls.Add(this.passTB);
+            this.groupBox6.Controls.Add(this.startB);
+            this.groupBox6.Controls.Add(this.rb);
+            this.groupBox6.Location = new System.Drawing.Point(12, 205);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Size = new System.Drawing.Size(571, 40);
+            this.groupBox6.TabIndex = 3;
+            this.groupBox6.TabStop = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(595, 240);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.passTB);
-            this.Controls.Add(this.rb);
-            this.Controls.Add(this.startB);
+            this.ClientSize = new System.Drawing.Size(595, 256);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.groupBox6);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "MainForm";
             this.Text = "№2. Блочные шифры";
             this.groupBox1.ResumeLayout(false);
@@ -333,8 +349,9 @@
             this.groupBox4.PerformLayout();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
+            this.groupBox6.ResumeLayout(false);
+            this.groupBox6.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -365,6 +382,7 @@
         private System.Windows.Forms.TextBox subblockTB;
         private System.Windows.Forms.TextBox passTB;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.GroupBox groupBox6;
     }
 }
 
