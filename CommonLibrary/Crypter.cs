@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -28,8 +29,21 @@ namespace CommonLibrary
 
         public int CurrentValueProcess { get; protected set; }
 
+        /// <summary>
+        /// Пароль - ключ
+        /// </summary>
         public string Password { get; protected set; }
 
+        /// <summary>
+        /// Количество подблоков
+        /// </summary>
+        public int SubBlocks { get; protected set; }
+
+
+        /// <summary>
+        /// Длина блока
+        /// </summary>
+        public byte BlockLenth { get; protected set; }
         /// <summary>
         /// Основная функция изменения блока данных по данному методу
         /// </summary>
@@ -38,7 +52,41 @@ namespace CommonLibrary
         /// <returns></returns>
         protected abstract byte[] CryptBlock(bool isEncrypt, byte[] buffer);
 
-        protected abstract void Crypt(string inputFile, string outputFile, bool isEncrypt);
+        /// <summary>
+        /// Общая функция преобразования входного массива байтов
+        /// </summary>
+        /// <param name="inputFile">путь входного файла</param>
+        /// <param name="outputFile">путь выходного файла</param>
+        /// <param name="isEncrypt">если true - шифрация, false - дешифрация</param>
+        /// <param name="key">ключ</param>
+        protected virtual void Crypt(string inputFile, string outputFile, bool isEncrypt)
+        {
+            var inputstream = File.OpenRead(inputFile);
+            var sr = new BinaryReader(inputstream);
+
+            var outputstream = File.OpenWrite(outputFile);
+            var wr = new BinaryWriter(outputstream);
+
+            this.CurrentValueProcess = 0;
+            this.MaxValueProcess = (int)(inputstream.Length);
+
+            while (true)
+            {
+                var buffer = sr.ReadBytes(this.BlockLenth);
+                if (buffer.Length == BlockLenth)
+                    buffer = CryptBlock(isEncrypt, buffer);
+                else
+                {
+                    this.CurrentValueProcess = this.MaxValueProcess - 1;
+                    wr.Write(buffer);
+                    break;
+                }
+                wr.Write(buffer);
+                this.CurrentValueProcess += 10;
+            }
+            inputstream.Close();
+            outputstream.Close();
+        }
 
         protected CryptStringFunctionDelegate GetCryptStringDelegate(bool isEncrypt)
         {
