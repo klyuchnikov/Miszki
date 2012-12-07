@@ -26,7 +26,6 @@ namespace Lab2
             rb.Maximum = 1000;
         }
 
-
         private void timer_Tick(object sender, EventArgs e)
         {
             if (crypter.MaxValueProcess == 0)
