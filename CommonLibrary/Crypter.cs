@@ -23,7 +23,11 @@ namespace CommonLibrary
         /// <summary>
         /// Несовпадение значений параметров записанных в файл с заданными
         /// </summary>
-        MismatchValueParameters
+        MismatchValueParameters,
+        /// <summary>
+        /// Несовпадение контрольной суммы
+        /// </summary>
+        MismatchСhecksum
     }
 
     public abstract class CrypterBlocks
@@ -109,6 +113,9 @@ namespace CommonLibrary
             this.CurrentValueProcess = 0;
             this.MaxValueProcess = (int)(inputstream.Length);
 
+            byte crc = 0xFF;
+            byte crcDec = 0;
+            long crcPosition = 0;
             if (isEncrypt)
             {
                 outputstream = File.OpenWrite(outputFile);
@@ -119,6 +126,8 @@ namespace CommonLibrary
                 var properties = this.GetType().GetProperties().Where(a => a.GetCustomAttributes(true).OfType<ParametrCryptAttribute>().Count() != 0).ToArray();
                 foreach (var p in properties)
                     wr.Write((byte)p.GetValue(this, null));
+                crcPosition = outputstream.Position;
+                outputstream.Seek(1, SeekOrigin.Current);
             }
             else
             {
@@ -130,10 +139,17 @@ namespace CommonLibrary
                 for (var i = 0; i < properties.Length; i++)
                     paramsValue[i] = sr.ReadByte();
                 if (hashPass != MaHash8v64.GetHashCode(this.Password))
+                {
+                    inputstream.Close();
                     return CryptResult.MismatchValueParameters;
+                }
                 for (var i = 0; i < properties.Length; i++)
                     if (paramsValue[i] != (byte)properties[i].GetValue(this, null))
+                    {
+                        inputstream.Close();
                         return CryptResult.MismatchValueParameters;
+                    }
+                crcDec = sr.ReadByte();
             }
             if (wr == null)
             {
@@ -143,9 +159,13 @@ namespace CommonLibrary
             while (true)
             {
                 var buffer = sr.ReadBytes(this.BlockLenth);
+                if (!isEncrypt)
+                    crc = GetCRC(crc, buffer);
                 if (buffer.Length == BlockLenth)
                     buffer = CryptBlock(isEncrypt, buffer);
-                else
+                if (isEncrypt)
+                    crc = GetCRC(crc, buffer);
+                if (buffer.Length != BlockLenth)
                 {
                     this.CurrentValueProcess = this.MaxValueProcess - 1;
                     wr.Write(buffer);
@@ -154,9 +174,34 @@ namespace CommonLibrary
                 wr.Write(buffer);
                 this.CurrentValueProcess += 10;
             }
+            if (isEncrypt)
+            {
+                outputstream.Seek(crcPosition, SeekOrigin.Begin);
+                wr.Write(crc);
+            }
+            else
+            {
+                if (crc != crcDec)
+                {
+                    inputstream.Close();
+                    outputstream.Close();
+                    return CryptResult.MismatchСhecksum;
+                }
+            }
             inputstream.Close();
             outputstream.Close();
             return CryptResult.Success;
+        }
+
+        private byte GetCRC(byte crc, byte[] buffer)
+        {
+            for (int j = 0; j < buffer.Length; j++)
+            {
+                crc ^= buffer[j];
+                for (uint i = 0; i < 8; i++)
+                    crc = (byte)((crc & 0x80) != 0 ? (crc << 1) ^ 0x31 : crc << 1);
+            }
+            return crc;
         }
 
         protected CryptStringFunctionDelegate GetCryptStringDelegate(bool isEncrypt)
