@@ -34,20 +34,7 @@ namespace Lab2
             var diff = DateTime.Now - oldTime;
             SpeedLabel.Text = string.Format("Скорость: {0:N} симв/сек", (crypter.CurrentValueProcess / diff.TotalSeconds));
             rb.Value = (int)((crypter.CurrentValueProcess / (double)crypter.MaxValueProcess) * 1000);
-            if (crypter.CurrentValueProcess == crypter.MaxValueProcess - 1)
-            {
-                timer.Stop();
-                rb.Maximum = 1000;
-                rb.Minimum = 0;
-                rb.Value = rb.Maximum;
-                SpeedLabel.Text = string.Format("Время выполнения: {0} секунд, {1:N} символов", (DateTime.Now - oldTime).TotalSeconds, crypter.MaxValueProcess);
-                groupBox1.Enabled = true;
-                groupBox2.Enabled = true;
-                groupBox3.Enabled = true;
-                groupBox4.Enabled = true;
-                groupBox5.Enabled = true;
-                groupBox6.Enabled = true;
-            }
+
         }
 
         private void onlyDigit_KeyPress(object sender, KeyPressEventArgs e)
@@ -127,6 +114,7 @@ namespace Lab2
             groupBox6.Enabled = false;
             oldTime = DateTime.Now;
             crypter.DecryptComplitedEvent += crypter_DecryptComplitedEvent;
+            crypter.EncryptComplitedEvent += crypter_DecryptComplitedEvent;
             if (encryptRB.Checked)
                 crypter.EncryptAsync(inputBrowseTB.Text, outputBrowseTB.Text);
             else if (decryptRB.Checked)
@@ -138,7 +126,19 @@ namespace Lab2
         void crypter_DecryptComplitedEvent(CryptResult cryptResult, string password)
         {
             if (cryptResult == CryptResult.MismatchValueParameters)
-                MessageBox.Show("Заданные параметры дешифрации не соответствуют параметрам при шифровании");
+                MessageBox.Show("Заданные параметры дешифрации не соответствуют параметрам при шифровании", "Ошибка");
+            timer.Stop();
+            rb.Maximum = 1000;
+            rb.Minimum = 0;
+            rb.Value = rb.Maximum;
+            if (cryptResult == CryptResult.Success)
+                SpeedLabel.Text = string.Format("Время выполнения: {0} секунд, {1:N} символов, средняя скорость: {2:N} симв/сек",
+                    (DateTime.Now - oldTime).TotalSeconds, crypter.MaxValueProcess, crypter.MaxValueProcess / (DateTime.Now - oldTime).TotalSeconds);
+            else if (cryptResult == CryptResult.MismatchValueParameters)
+                SpeedLabel.Text = "Ошибка. Заданные параметры дешифрации не соответствуют параметрам при шифровании!";
+            else if (cryptResult == CryptResult.MismatchСhecksum)
+                SpeedLabel.Text = "Ошибка. Контрольная сумма не совпадает!";
+
             groupBox1.Enabled = true;
             groupBox2.Enabled = true;
             groupBox3.Enabled = true;
