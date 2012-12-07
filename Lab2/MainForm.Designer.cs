@@ -89,6 +89,7 @@
             this.lenthBlockTB.Size = new System.Drawing.Size(73, 20);
             this.lenthBlockTB.TabIndex = 2;
             this.lenthBlockTB.Text = "10";
+            this.lenthBlockTB.TextChanged += new System.EventHandler(this.onlyByte_TextChange);
             this.lenthBlockTB.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.onlyDigit_KeyPress);
             // 
             // groupBox1
@@ -111,6 +112,7 @@
             this.ecbRB.TabIndex = 1;
             this.ecbRB.Text = "ECB";
             this.ecbRB.UseVisualStyleBackColor = true;
+            this.ecbRB.CheckedChanged += new System.EventHandler(this.ecbRB_CheckedChanged);
             // 
             // feistelRB
             // 
@@ -140,6 +142,7 @@
             this.roundTB.Size = new System.Drawing.Size(96, 20);
             this.roundTB.TabIndex = 2;
             this.roundTB.Text = "1";
+            this.roundTB.TextChanged += new System.EventHandler(this.onlyByte_TextChange);
             this.roundTB.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.onlyDigit_KeyPress);
             // 
             // groupBox2

@@ -44,6 +44,18 @@ namespace Lab2
                 e.Handled = true;
         }
 
+        private void onlyByte_TextChange(object sender, EventArgs e)
+        {
+            var textbox = sender as TextBox;
+            byte res;
+            if (!byte.TryParse(textbox.Text, out res) && textbox.Text != "")
+            {
+                MessageBox.Show("Значение должно находиться в диапазоне от 0 до 254.");
+                textbox.Text = "";
+                return;
+            }
+        }
+
         private void brouseInputFileB_Click(object sender, EventArgs e)
         {
             var openFileDialog = new OpenFileDialog();
@@ -66,8 +78,15 @@ namespace Lab2
 
         private void subblockTB_TextChanged(object sender, EventArgs e)
         {
-            if (subblockTB.Text == "" || lenthBlockTB.Text == "")
+            onlyByte_TextChange(sender, e);
+            if (subblockTB.Text == "")
                 return;
+            if (lenthBlockTB.Text == "")
+            {
+                MessageBox.Show("Задайте сначала длину блока.");
+                subblockTB.Text = "";
+                return;
+            }
             if (int.Parse(subblockTB.Text) <= int.Parse(lenthBlockTB.Text)) return;
             MessageBox.Show("Количество подблоков не может быть больше поливины длины блока.");
             subblockTB.Text = "";
@@ -145,6 +164,12 @@ namespace Lab2
             groupBox4.Enabled = true;
             groupBox5.Enabled = true;
             groupBox6.Enabled = true;
+        }
+
+        private void ecbRB_CheckedChanged(object sender, EventArgs e)
+        {
+            label2.Enabled = !ecbRB.Checked;
+            roundTB.Enabled = !ecbRB.Checked;
         }
     }
 }
