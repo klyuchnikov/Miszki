@@ -114,6 +114,16 @@ namespace Lab2
                 MessageBox.Show("Задайте колличество иттераций.");
                 return;
             }
+            if (inputBrowseTB.Text == "")
+            {
+                MessageBox.Show("Задайте входной файл.");
+                return;
+            }
+            if (outputBrowseTB.Text == "")
+            {
+                MessageBox.Show("Задайте выходной файл.");
+                return;
+            }
             var lenthBlock = byte.Parse(lenthBlockTB.Text);
             var round = byte.Parse(roundTB.Text);
             var subblocks = byte.Parse(subblockTB.Text);
@@ -170,6 +180,16 @@ namespace Lab2
         {
             label2.Enabled = !ecbRB.Checked;
             roundTB.Enabled = !ecbRB.Checked;
+        }
+
+        private void ExistsFile_TextChanged(object sender, EventArgs e)
+        {
+            if (!File.Exists((sender as TextBox).Text))
+            {
+                MessageBox.Show("По данному пути файла не существует. Задайте другой путь.");
+                (sender as TextBox).Text = "";
+                return;
+            }
         }
     }
 }

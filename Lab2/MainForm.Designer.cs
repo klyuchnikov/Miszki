@@ -88,7 +88,6 @@
             this.lenthBlockTB.Name = "lenthBlockTB";
             this.lenthBlockTB.Size = new System.Drawing.Size(73, 20);
             this.lenthBlockTB.TabIndex = 2;
-            this.lenthBlockTB.Text = "10";
             this.lenthBlockTB.TextChanged += new System.EventHandler(this.onlyByte_TextChange);
             this.lenthBlockTB.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.onlyDigit_KeyPress);
             // 
@@ -141,7 +140,6 @@
             this.roundTB.Name = "roundTB";
             this.roundTB.Size = new System.Drawing.Size(96, 20);
             this.roundTB.TabIndex = 2;
-            this.roundTB.Text = "1";
             this.roundTB.TextChanged += new System.EventHandler(this.onlyByte_TextChange);
             this.roundTB.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.onlyDigit_KeyPress);
             // 
@@ -217,7 +215,7 @@
             this.inputBrowseTB.Name = "inputBrowseTB";
             this.inputBrowseTB.Size = new System.Drawing.Size(438, 20);
             this.inputBrowseTB.TabIndex = 2;
-            this.inputBrowseTB.Text = "D:\\Documents\\расписание весенний семестр 2011.rar";
+            this.inputBrowseTB.LostFocus += new System.EventHandler(this.ExistsFile_TextChanged);
             // 
             // label3
             // 
@@ -267,7 +265,7 @@
             this.outputBrowseTB.Name = "outputBrowseTB";
             this.outputBrowseTB.Size = new System.Drawing.Size(438, 20);
             this.outputBrowseTB.TabIndex = 2;
-            this.outputBrowseTB.Text = "D:\\Documents\\outqq.rar";
+            this.outputBrowseTB.LostFocus += new System.EventHandler(this.ExistsFile_TextChanged);
             // 
             // brouseOutputFileB
             // 
@@ -304,7 +302,6 @@
             this.passTB.Name = "passTB";
             this.passTB.Size = new System.Drawing.Size(100, 20);
             this.passTB.TabIndex = 7;
-            this.passTB.Text = "qwe";
             // 
             // label6
             // 
