@@ -265,7 +265,6 @@
             this.outputBrowseTB.Name = "outputBrowseTB";
             this.outputBrowseTB.Size = new System.Drawing.Size(438, 20);
             this.outputBrowseTB.TabIndex = 2;
-            this.outputBrowseTB.LostFocus += new System.EventHandler(this.ExistsFile_TextChanged);
             // 
             // brouseOutputFileB
             // 
