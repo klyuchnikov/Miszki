@@ -18,12 +18,12 @@ namespace CommonLibrary
             if (source < 2 || source % 2 == 0)
                 return false;
 
-            BigInteger d = source - 1;
+            BigInteger t = source - 1;
             int s = 0;
 
-            while (d % 2 == 0)
+            while (t % 2 == 0)
             {
-                d /= 2;
+                t /= 2;
                 s += 1;
             }
 
@@ -38,13 +38,11 @@ namespace CommonLibrary
             {
                 do
                 {
-                    // This may raise an exception in Mono 2.10.8 and earlier.
-                    // http://bugzilla.xamarin.com/show_bug.cgi?id=2761
                     rng.GetBytes(bytes);
                     a = new BigInteger(bytes);
                 } while (a < 2 || a >= source - 2);
 
-                BigInteger x = BigInteger.ModPow(a, d, source);
+                BigInteger x = BigInteger.ModPow(a, t, source);
                 if (x == 1 || x == source - 1)
                     continue;
 
