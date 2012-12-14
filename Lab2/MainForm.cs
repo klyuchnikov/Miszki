@@ -26,6 +26,19 @@ namespace Lab2
             rb.Maximum = 1000;
         }
 
+        public MainForm(string[] args)
+            : this()
+        {
+            passTB.Text = args[0];
+            encryptRB.Checked = args[1] == "1";
+            decryptRB.Checked = args[1] == "2";
+            inputBrowseTB.Text = args[2];
+            outputBrowseTB.Text = args[3];
+            roundTB.Text = 3 + "";
+            lenthBlockTB.Text = 10 + "";
+            subblockTB.Text = 3 + "";
+        }
+
         private void timer_Tick(object sender, EventArgs e)
         {
             if (crypter.MaxValueProcess == 0)
