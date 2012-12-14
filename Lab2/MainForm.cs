@@ -131,6 +131,11 @@ namespace Lab2
                 MessageBox.Show("Задайте входной файл.");
                 return;
             }
+            if (!File.Exists(inputBrowseTB.Text))
+            {
+                MessageBox.Show("Входного файла не существует.");
+                return;
+            }
             if (outputBrowseTB.Text == "")
             {
                 MessageBox.Show("Задайте выходной файл.");
