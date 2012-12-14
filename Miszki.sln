@@ -1,11 +1,13 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lab1", "Lab1\Lab1.csproj", "{96A33433-C1B1-4231-9A5C-2FD1688A7EA1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonLibrary", "CommonLibrary\CommonLibrary.csproj", "{2CA57F9B-45F1-4B76-A27D-E138A83A70CD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lab2", "Lab2\Lab2.csproj", "{818CC424-E428-442E-A704-B8867E4A6EAA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lab3", "Lab3\Lab3.csproj", "{9F127875-AEAE-4F7D-95D2-34F6013BDF08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,16 @@ Global
 		{818CC424-E428-442E-A704-B8867E4A6EAA}.Release|Mixed Platforms.Build.0 = Release|x86
 		{818CC424-E428-442E-A704-B8867E4A6EAA}.Release|x86.ActiveCfg = Release|x86
 		{818CC424-E428-442E-A704-B8867E4A6EAA}.Release|x86.Build.0 = Release|x86
+		{9F127875-AEAE-4F7D-95D2-34F6013BDF08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F127875-AEAE-4F7D-95D2-34F6013BDF08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F127875-AEAE-4F7D-95D2-34F6013BDF08}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{9F127875-AEAE-4F7D-95D2-34F6013BDF08}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{9F127875-AEAE-4F7D-95D2-34F6013BDF08}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9F127875-AEAE-4F7D-95D2-34F6013BDF08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F127875-AEAE-4F7D-95D2-34F6013BDF08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F127875-AEAE-4F7D-95D2-34F6013BDF08}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9F127875-AEAE-4F7D-95D2-34F6013BDF08}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{9F127875-AEAE-4F7D-95D2-34F6013BDF08}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

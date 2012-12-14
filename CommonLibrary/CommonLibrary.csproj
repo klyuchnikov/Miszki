@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -40,12 +41,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BigIntegerExtensions.cs" />
     <Compile Include="Crypter.cs" />
     <Compile Include="ECB.cs" />
     <Compile Include="FeistelNetwork.cs" />
     <Compile Include="Generator.cs" />
     <Compile Include="MaHash8v64.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RabinMiller.cs" />
+    <Compile Include="RSA.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
