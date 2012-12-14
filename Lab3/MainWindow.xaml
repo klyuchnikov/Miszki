@@ -1,8 +1,109 @@
 ﻿<Window x:Class="Lab3.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Использование систем с открытым ключем" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+        Title="Использование систем с открытым ключем"
+        Height="478"
+        Width="525">
+    <StackPanel Orientation="Vertical">
+        <Grid Height="100"
+              Name="workGrid">
+            <Button Content="Обзор"
+                    HorizontalAlignment="Left"
+                    Margin="432,26,0,0"
+                    VerticalAlignment="Top"
+                    Width="75"
+                    Click="Button_Click_1" />
+            <Label Content="Рабочая папка:"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   Margin="10,0,0,0" />
+            <TextBox HorizontalAlignment="Left"
+                     Name="workFolderTB"
+                     Height="23"
+                     Margin="10,26,0,0"
+                     TextWrapping="Wrap"
+                     Text=""
+                     VerticalAlignment="Top"
+                     Width="417"
+                     IsEnabled="False" />
+            <Button Content="Генерация ключей"
+                    HorizontalAlignment="Left"
+                    Margin="10,68,0,0"
+                    Click="GenRSAKeys"
+                    Name="GenRSAKeysB"
+                    VerticalAlignment="Top"
+                    Width="116" />
+            <ProgressBar HorizontalAlignment="Left"
+                         Height="22"
+                         Name="prog"
+                         Margin="131,68,0,0"
+                         VerticalAlignment="Top"
+                         Width="376" />
+        </Grid>
+
+        <Grid Height="70"
+              Name="encryptPassGrid">
+            <TextBox Height="23" Name="pathPassTB"
+                     VerticalAlignment="Top"
+                     Margin="0,36,185,0"></TextBox>
+            <Label Content=" Путь к файлу с паролем:"
+                   HorizontalAlignment="Left"
+                   Margin="10,10,0,0"
+                   VerticalAlignment="Top" />
+            <Button Content="Шифрование"
+                    HorizontalAlignment="Left"
+                    Margin="417,39,0,0"
+                    VerticalAlignment="Top"
+                    Width="90"
+                    Click="EncryptPass" />
+            <Button Content="Обзор"
+                    HorizontalAlignment="Left"
+                    Margin="337,40,0,0"
+                    VerticalAlignment="Top"
+                    Width="75"
+                    Click="Button_Click_2" />
+        </Grid>
+        <Grid Height="70"
+              Name="decryptPassGrid">
+            <TextBox Height="23"
+                     Name="pathCodPassTB"
+                     VerticalAlignment="Top"
+                     Margin="0,36,185,0" />
+            <Label Content=" Путь к файлу с зашифрованным паролем:"
+                   HorizontalAlignment="Left"
+                   Margin="10,10,0,0"
+                   VerticalAlignment="Top" />
+            <Button Content="Дешифрование"
+                    HorizontalAlignment="Left"
+                    Margin="417,39,0,0"
+                    VerticalAlignment="Top"
+                    Width="90"
+                    Click="DecryptPass" />
+            <Button Content="Обзор"
+                    HorizontalAlignment="Left"
+                    Margin="337,40,0,0"
+                    VerticalAlignment="Top"
+                    Width="75"
+                    Click="Button_Click_3" />
+        </Grid>
+
+        <Grid Height="70"
+              Name="encryptMGrid">
+           <Button Content="Запустить шифрование файла"
+                    HorizontalAlignment="Left"
+                    Margin="110,25,0,0"
+                    VerticalAlignment="Top"
+                    Width="292"
+                    Click="EncryptFile" />
+        </Grid>
+        <Grid Height="70"
+              Name="decryptMGrid">
+            <Button Content="Запустить дешифрование файла"
+                    HorizontalAlignment="Left"
+                    Margin="110,25,0,0"
+                    VerticalAlignment="Top"
+                    Width="292"
+                    Click="DecryptFile" />
+        </Grid>
+    </StackPanel>
 </Window>
