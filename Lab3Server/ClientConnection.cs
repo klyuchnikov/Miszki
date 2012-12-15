@@ -91,12 +91,6 @@ namespace Lab3Server
                 ProcessReceive(e);
         }
 
-        private void SendAsync(string data)
-        {
-            byte[] buff = Encoding.UTF8.GetBytes(data);
-            SendBytes(buff);
-        }
-
         private void SendAsync(SocketAsyncEventArgs e)
         {
             bool willRaiseEvent = Sock.SendAsync(e);

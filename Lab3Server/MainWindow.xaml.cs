@@ -105,10 +105,10 @@ namespace Lab3Server
             var open_key = File.ReadAllLines(SenderPath + @"\open_key.txt");
             var D = new BigInteger(open_key[0].Split(' ').Select(a => byte.Parse(a.ToString(), NumberStyles.HexNumber)).ToArray());
             var N = new BigInteger(open_key[1].Split(' ').Select(a => byte.Parse(a.ToString(), NumberStyles.HexNumber)).ToArray());
-            var cryptArr = new BigInteger[bytes.Length / N.ToByteArray().Length + 1];
+            var cryptArr = new BigInteger[(bytes.Length / (N.ToByteArray().Length - 1) + 1)];
             for (int i = 0, k = 0; i < bytes.Length; i = i)
             {
-                var data = bytes.Skip(i).Take(N.ToByteArray().Length).ToArray();
+                var data = bytes.Skip(i).Take(N.ToByteArray().Length - 1).ToArray();
                 cryptArr[k++] = RSAEx.EnCrypt(new BigInteger(data), D, N);
                 i += data.Length;
             }
@@ -118,7 +118,7 @@ namespace Lab3Server
 
         private void SendFileToClients(object sender, RoutedEventArgs e)
         {
-            var data = new List<byte> { 2 };
+            var data = new List<byte> { 3 };
             data.AddRange(File.ReadAllBytes(filePath.Text));
             foreach (var clientConnection in Server.Current.ListConnection)
             {
