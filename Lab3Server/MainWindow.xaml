@@ -1,0 +1,83 @@
+﻿<Window x:Class="Lab3Server.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Lab3Server"
+        Title="MainWindow"
+        Height="350"
+        Width="525">
+    <StackPanel  DataContext="{Binding Source={x:Static local:Server.Current}}">
+        <GroupBox Height="95"
+                  Header="Генерация ключей">
+            <Grid Name="workGrid">
+                <Button Content="Генерация ключей"
+                        HorizontalAlignment="Left"
+                        Margin="10,10,0,0"
+                        Click="GenRSAKeys"
+                        Name="GenRSAKeysB"
+                        VerticalAlignment="Top"
+                        Width="116" />
+                <ProgressBar HorizontalAlignment="Left"
+                             Height="22"
+                             Name="prog"
+                             Margin="131,10,-2,0"
+                             VerticalAlignment="Top"
+                             Width="376" />
+                <Button Content="Отправить клиентам закрытый ключ"
+                        HorizontalAlignment="Left"
+                        Margin="167,47,0,0"
+                        Click="SendCloseKey"
+                        IsEnabled="False"
+                        Name="SendCloseKeyB"
+                        VerticalAlignment="Top"
+                        Width="214" />
+            </Grid>
+        </GroupBox>
+        <GroupBox>
+            <StackPanel>
+                <StackPanel>
+                    <StackPanel Margin="2"
+                                Orientation="Horizontal">
+                        <TextBox Name="filePathOpen"
+                                 Width="450"
+                                 IsEnabled="False"></TextBox>
+                        <Button Width="50"
+                                Content="Обзор"
+                                Click="filePathOpen_browse"></Button>
+                    </StackPanel>
+                    <StackPanel Margin="2">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox Name="filePathEncrypt"
+                                     Width="450"
+                                     IsEnabled="False"></TextBox>
+                            <Button Width="50"
+                                    Content="Обзор"
+                                    Click="filePathEncrypt_browse"></Button>
+                        </StackPanel>
+                        <Button Content="Зашифровать файл"
+                                Click="encryptFile"></Button>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox>
+            <StackPanel>
+                <StackPanel Margin="2"
+                            Orientation="Horizontal">
+                    <TextBox Name="filePath"
+                             Width="450"
+                             IsEnabled="False"></TextBox>
+                    <Button Width="50"
+                            Content="Обзор"
+                            Click="file_browse"></Button>
+                </StackPanel>
+                <Button Content="Отправить файл клиентам"
+                        Click="SendFileToClients"></Button>
+            </StackPanel>
+        </GroupBox>
+        <StackPanel Orientation="Horizontal">
+            <Label Content="Клиентов на сервере:" />
+            <Label Width="30"
+                   Content="{Binding Path=ListConnection.Count}"></Label>
+        </StackPanel>
+    </StackPanel>
+</Window>
