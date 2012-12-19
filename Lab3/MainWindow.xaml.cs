@@ -88,7 +88,7 @@ namespace Lab3
                         {
                             string.Join(" ",keys.Item3.ToByteArray().Select(a => a.ToString("X"))),
                             string.Join(" ",keys.Item4.ToByteArray().Select(a => a.ToString("X")))
-                        }); Dispatcher.InvokeAsync(new Action(() =>
+                        }); Dispatcher.Invoke(new Action(() =>
                         {
                             prog.IsIndeterminate = false;
                             GenRSAKeysB.IsEnabled = true;

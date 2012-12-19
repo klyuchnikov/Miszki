@@ -74,7 +74,7 @@ namespace Lab3Server
                         {
                             string.Join(" ",keys.Item3.ToByteArray().Select(a => a.ToString("X"))),
                             string.Join(" ",keys.Item4.ToByteArray().Select(a => a.ToString("X")))
-                        }); Dispatcher.InvokeAsync(new Action(() =>
+                        }); Dispatcher.Invoke(new Action(() =>
                             {
                                 MessageBox.Show("Открытый ключ - open_key.txt, Закрытый ключ - close_key.txt");
                                 prog.IsIndeterminate = false;
